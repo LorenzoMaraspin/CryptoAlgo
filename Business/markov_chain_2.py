@@ -5,13 +5,15 @@ import logging
 logger =  logging.getLogger("CryptoAlgo")
 
 class MarkovImplementation():
-    def __init__(self, len_state: int, list_candle_prices: list):
+    def __init__(self, len_state: int, list_candle_prices: list, list_candle_time):
         self.len_state = len_state
         self.states = [0] * self.len_state
         self.price = [0] * self.len_state
+        self.time = [0] * self.len_state
         self.list_candle_prices = list_candle_prices
         self.tuple_checks = []
         self.matrix = [[0 for _ in range(2)] for _ in range(2)]
+        self.list_candle_time = list_candle_time
 
 
     def init_matrix_and_lists(self, row):
@@ -32,7 +34,7 @@ class MarkovImplementation():
                 self.states[i]=0
             logger.info(f"Array comparison: [{i}]: {self.list_candle_prices[i]} > [{i-1}]: {self.list_candle_prices[i-1]} - outcome: {check}")
             self.price[i] = self.list_candle_prices[i]
-
+            self.time[i] = self.list_candle_time[i]
             self.check_state_change(i)
 
         logger.info(f"Tuple of state changes: {self.tuple_checks}")
@@ -48,11 +50,12 @@ class MarkovImplementation():
     def check_state_change(self, i):
         prices = self.price
         states = self.states
+        times = self.time
 
         if states[i] != states[i-1]:
             x,y = states[i-1], states[i]
             self.matrix[x][y] += 1
-        self.tuple_checks.append((states[i], float(prices[i])))
+        self.tuple_checks.append((states[i], float(prices[i]), times[i]))
 
         #[(states[i], prices[i]) for i in range(1, len(prices)) if states[i] != states[i - 1]]
 
@@ -63,12 +66,12 @@ class MarkovImplementation():
         return result
 
     def extract_tuples_with_highest_value(self, value):
-        filtered_data = [(int(val[0]), float(val[1])) for val in self.tuple_checks if val[0] == value]
+        filtered_data = [(int(val[0]), float(val[1]), val[2]) for val in self.tuple_checks if val[0] == value]
         tuple_with_highest_number = max(filtered_data, key=lambda x: x[1])
 
         logger.info(f"HIGH: {value} - {tuple_with_highest_number}")
     def extract_tuples_with_lowest_value(self, value):
-        filtered_data = [(int(val[0]), float(val[1])) for val in self.tuple_checks if val[0] == value]
+        filtered_data = [(int(val[0]), float(val[1]), val[2]) for val in self.tuple_checks if val[0] == value]
         tuple_with_lowest_number = min(filtered_data, key=lambda x: x[1])
 
         logger.info(f"LOW: {value} - {tuple_with_lowest_number}")

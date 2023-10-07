@@ -24,7 +24,7 @@ def run(index):
     btc_15m_data = btc_15m_api.get_klines()
     btc_15m_data_formatted = hst_data_formatter.format_klines_request(btc_15m_data)
 
-    markov_implementation = MarkovImplementation(candle_numbers,btc_15m_data_formatted["close_price"].tolist() )
+    markov_implementation = MarkovImplementation(candle_numbers,btc_15m_data_formatted["close_price"].tolist(), btc_15m_data_formatted["close_time"].tolist() )
     # Test the function
     result = markov_implementation.fit_transition_matrix()
     markov_implementation.extract_tuples_with_highest_value(1)
@@ -47,26 +47,7 @@ def calculate_state_changes(price_list):
             changed_states.append((price_list[i], 0))
 
     return state_changes, changed_states
-"""
-# Esempio di lista di prezzi
-price_list = [100, 105, 103, 108, 106, 110, 108, 115, 120, 118]
 
-# Calcola le variazioni di stato e i cambiamenti di stato
-state_changes, changed_states = calculate_state_changes(price_list)
-
-# Stampa le variazioni di stato
-print("Variazioni di stato:", state_changes)
-
-# Stampa i cambiamenti di stato (prezzo, stato)
-print("Cambiamenti di stato:", changed_states)
-# Estrai il valore massimo quando lo stato è 1 e il valore minimo quando lo stato è 0
-max_state_1 = max([price for price, state in changed_states if state == 1])
-min_state_0 = min([price for price, state in changed_states if state == 0])
-
-# Stampa i valori massimo e minimo
-print("Valore massimo (stato 1):", max_state_1)
-print("Valore minimo (stato 0):", min_state_0)
-"""
 
 for i in range(0,3,1):
     run(i)
